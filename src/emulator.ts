@@ -37,7 +37,10 @@ export class Chip8Emu {
     }
 
     executeCurrentCommand(screen: Chip8Screen) {
-        const executor = createOpCodeFromState(this.state);
+        this.state.delayTimer = Math.max(0, this.state.delayTimer - 1);
+        this.state.soundTimer = Math.max(0, this.state.soundTimer - 1);
+
+        const executor = createOpCodeFromState(this.state, this.passion);
         if (executor) {
             executor.execute(this.state);
             screen.flip(this.state.pixels);

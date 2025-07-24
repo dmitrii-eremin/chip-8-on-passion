@@ -3,7 +3,7 @@ import { Chip8Screen } from "./screen";
 import { Size } from "@dmitrii-eremin/passion-engine/engine-build/stdlib/size";
 import { C8_EMU_TITLE, C8_SCREEN_MULTIPLIER, C8_SCREEN_WIDTH } from "./consts";
 import { Chip8Emu } from "./emulator";
-import { DEMO_PROGRAM_1 } from "./demo_programs";
+import { DEMO_PROGRAM_1, DEMO_PROGRAM_IBM } from "./demo_programs";
 
 export class Chip8Game {
     private screen: Chip8Screen;
@@ -17,16 +17,16 @@ export class Chip8Game {
         this.screen = new Chip8Screen(passion);
         this.emulator = new Chip8Emu(passion, this.screen);
 
-        this.emulator.load(DEMO_PROGRAM_1);
+        this.emulator.load(DEMO_PROGRAM_IBM);
 
         this.passion.system.init(this.windowSize.width, this.windowSize.height, "CHIP-8 Emu by passion games team");
         this.passion.system.run(dt => this.update(dt), () => this.draw());
     }
 
     update(dt: number) {
-        if (this.passion.input.btnp('Space')) {
+        //if (this.passion.input.btnp('Space')) {
             this.emulator.executeCurrentCommand(this.screen);
-        }
+        //}
         this.emulator.update(dt);
     }
 
