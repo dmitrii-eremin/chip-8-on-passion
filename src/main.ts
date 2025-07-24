@@ -6,6 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const app = document.getElementById('app') as HTMLCanvasElement | null;
   if (app) {
-    const game = new Chip8Game(new Passion(app));
+    new Chip8Game(new Passion(app));
   }
 });
