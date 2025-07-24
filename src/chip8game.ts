@@ -17,16 +17,17 @@ export class Chip8Game {
         this.screen = new Chip8Screen(passion);
         this.emulator = new Chip8Emu(passion, this.screen);
 
-        this.emulator.load(DEMO_PROGRAM_IBM);
+        // this.emulator.load(DEMO_PROGRAM_IBM);
+        this.emulator.load(DEMO_PROGRAM_1);
 
         this.passion.system.init(this.windowSize.width, this.windowSize.height, "CHIP-8 Emu by passion games team");
         this.passion.system.run(dt => this.update(dt), () => this.draw());
     }
 
     update(dt: number) {
-        //if (this.passion.input.btnp('Space')) {
+        if (this.passion.input.btnp('Space')) {
             this.emulator.executeCurrentCommand(this.screen);
-        //}
+        }
         this.emulator.update(dt);
     }
 

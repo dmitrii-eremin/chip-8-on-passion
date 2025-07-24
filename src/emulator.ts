@@ -2,7 +2,7 @@ import { Size } from "@dmitrii-eremin/passion-engine/engine-build/stdlib/size";
 import { Chip8Screen } from "./screen";
 import { OpCode } from "./types";
 import { Passion } from "@dmitrii-eremin/passion-engine";
-import { C8_MEMORY_SIZE, C8_PROGRAM_START_ADDRESS, C8_REGISTER_COUNT, C8_STACK_SIZE } from "./consts";
+import { C8_DEFAULT_FONT, C8_FONT_START_ADDRESS, C8_MEMORY_SIZE, C8_PROGRAM_START_ADDRESS, C8_REGISTER_COUNT, C8_STACK_SIZE } from "./consts";
 import { Chip8State } from "./state";
 import { createOpCodeFromState } from "./opcodes";
 
@@ -21,7 +21,19 @@ export class Chip8Emu {
     private serviceInfoLayout?: ServiceInfoLayout;
 
     constructor(private passion: Passion, private screen: Chip8Screen) {
+        this.reset();
+    }
 
+    reset() {
+        this.state.reset();
+        this.loadFont(C8_DEFAULT_FONT);
+    }
+
+    private loadFont(font: OpCode[]) {
+        const startAddress = C8_FONT_START_ADDRESS;
+        for (let i = 0; i < font.length; i++) {
+            this.state.memory[startAddress + i] = font[i];
+        }
     }
 
     load(program: OpCode[]) {

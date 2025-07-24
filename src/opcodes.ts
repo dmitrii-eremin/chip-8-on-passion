@@ -1,5 +1,5 @@
 import { Passion } from "@dmitrii-eremin/passion-engine";
-import { C8_MEMORY_SIZE, C8_SCREEN_HEIGHT, C8_SCREEN_WIDTH, C8_STACK_SIZE } from "./consts";
+import { C8_FONT_START_ADDRESS, C8_MEMORY_SIZE, C8_SCREEN_HEIGHT, C8_SCREEN_WIDTH, C8_STACK_SIZE } from "./consts";
 import { Chip8State } from "./state";
 
 const getCurrentOpCodeValue = (state: Chip8State): number | undefined => {
@@ -321,6 +321,58 @@ export class OpCode_FX1E implements OpCode {
     }
 }
 
+export class OpCode_FX29 implements OpCode {
+    execute(state: Chip8State): void {
+        const opcode = getCurrentOpCodeValue(state)!;
+        const index = (opcode >> 8) & 0xF;
+        const value = state.register[index];
+        state.indexRegister = C8_FONT_START_ADDRESS + (5 * value);
+        state.programCounter += 2;
+    }
+}
+
+export class OpCode_FX33 implements OpCode {
+    execute(state: Chip8State): void {
+        debugger;
+        const opcode = getCurrentOpCodeValue(state)!;
+        const index = (opcode >> 8) & 0xF;
+        let value = state.register[index];
+
+        state.memory[state.indexRegister + 2] = value % 10;
+        value = Math.ceil(value / 10);
+
+        state.memory[state.indexRegister + 1] = value % 10;
+        value = Math.ceil(value / 10);
+
+        state.memory[state.indexRegister + 0] = value % 10;
+
+        state.programCounter += 2;
+    }
+}
+
+export class OpCode_FX55 implements OpCode {
+    execute(state: Chip8State): void {
+        const opcode = getCurrentOpCodeValue(state)!;
+        const index = (opcode >> 8) & 0xF;
+        for (let i = 0; i <= index; i++) {
+            const value = state.register[i];
+            state.memory[state.indexRegister + i] = value & 0xFF;
+        }
+        state.programCounter += 2;
+    }
+}
+
+export class OpCode_FX65 implements OpCode {
+    execute(state: Chip8State): void {
+        const opcode = getCurrentOpCodeValue(state)!;
+        const index = (opcode >> 8) & 0xF;
+        for (let i = 0; i <= index; i++) {
+            state.register[i] = state.memory[state.indexRegister + i] & 0xFF;
+        }
+        state.programCounter += 2;
+    }
+}
+
 export const createOpCodeFromState = (state: Chip8State, passion: Passion): OpCode | undefined => {
     const opcode = getCurrentOpCodeValue(state);
     if (opcode === undefined) {
@@ -328,85 +380,128 @@ export const createOpCodeFromState = (state: Chip8State, passion: Passion): OpCo
     }
 
     if (opcode === 0x00E0) {
+        console.debug(`Executing opcode: 00E0`);
         return new OpCode_00E0();
     }
     if (opcode === 0x00EE) {
+        console.debug(`Executing opcode: 00EE`);
         return new OpCode_00EE();
     }
     if ((opcode & 0xF000) === 0x1000) {
+        console.debug(`Executing opcode: 1NNN`);
         return new OpCode_1NNN();
     }
     if ((opcode & 0xF000) === 0x2000) {
+        console.debug(`Executing opcode: 2NNN`);
         return new OpCode_2NNN();
     }
     if ((opcode & 0xF000) === 0x3000) {
+        console.debug(`Executing opcode: 3XNN`);
         return new OpCode_3XNN();
     }
     if ((opcode & 0xF000) === 0x4000) {
+        console.debug(`Executing opcode: 4XNN`);
         return new OpCode_4XNN();
     }
     if ((opcode & 0xF000) === 0x5000) {
+        console.debug(`Executing opcode: 5XY0`);
         return new OpCode_5XY0();
     }
     if ((opcode & 0xF000) === 0x6000) {
+        console.debug(`Executing opcode: 6XNN`);
         return new OpCode_6XNN();
     }
     if ((opcode & 0xF000) === 0x7000) {
+        console.debug(`Executing opcode: 7XNN`);
         return new OpCode_7XNN();
     }
     if ((opcode & 0xF00F) === 0x8000) {
+        console.debug(`Executing opcode: 8XY0`);
         return new OpCode_8XY0();
     }
     if ((opcode & 0xF00F) === 0x8001) {
+        console.debug(`Executing opcode: 8XY1`);
         return new OpCode_8XY1();
     }
     if ((opcode & 0xF00F) === 0x8002) {
+        console.debug(`Executing opcode: 8XY2`);
         return new OpCode_8XY2();
     }
     if ((opcode & 0xF00F) === 0x8003) {
+        console.debug(`Executing opcode: 8XY3`);
         return new OpCode_8XY3();
     }
     if ((opcode & 0xF00F) === 0x8004) {
+        console.debug(`Executing opcode: 8XY4`);
         return new OpCode_8XY4();
     }
     if ((opcode & 0xF00F) === 0x8005) {
+        console.debug(`Executing opcode: 8XY5`);
         return new OpCode_8XY5();
     }
     if ((opcode & 0xF00F) === 0x8006) {
+        console.debug(`Executing opcode: 8XY6`);
         return new OpCode_8XY6();
     }
     if ((opcode & 0xF00F) === 0x8007) {
+        console.debug(`Executing opcode: 8XY7`);
         return new OpCode_8XY7();
     }
     if ((opcode & 0xF00F) === 0x800E) {
+        console.debug(`Executing opcode: 8XYE`);
         return new OpCode_8XYE();
     }
     if ((opcode & 0xF000) === 0x9000) {
+        console.debug(`Executing opcode: 9XY0`);
         return new OpCode_9XY0();
     }
     if ((opcode & 0xF000) === 0xA000) {
+        console.debug(`Executing opcode: ANNN`);
         return new OpCode_ANNN();
     }
     if ((opcode & 0xF000) === 0xB000) {
+        console.debug(`Executing opcode: BNNN`);
         return new OpCode_BNNN();
     }
     if ((opcode & 0xF000) === 0xC000) {
+        console.debug(`Executing opcode: CXNN`);
         return new OpCode_CXNN(passion);
     }
-    if ((opcode & 0xD000) === 0xD000) {
+    if ((opcode & 0xF000) === 0xD000) {
+        console.debug(`Executing opcode: DXYN`);
         return new OpCode_DXYN();
     }
     if ((opcode & 0xF0FF) === 0xF007) {
+        console.debug(`Executing opcode: FX07`);
         return new OpCode_FX07();
     }
     if ((opcode & 0xF0FF) === 0xF015) {
+        console.debug(`Executing opcode: FX15`);
         return new OpCode_FX15();
     }
     if ((opcode & 0xF0FF) === 0xF018) {
+        console.debug(`Executing opcode: FX18`);
         return new OpCode_FX18();
     }
     if ((opcode & 0xF0FF) === 0xF01E) {
+        console.debug(`Executing opcode: FX1E`);
         return new OpCode_FX1E();
+    }
+    if ((opcode & 0xF0FF) === 0xF029) {
+        console.debug(`Executing opcode: FX29`);
+        return new OpCode_FX29();
+    }
+    if ((opcode & 0xF0FF) === 0xF033) {
+        console.debug(`Executing opcode: FX33`);
+        return new OpCode_FX33();
+    }
+    if ((opcode & 0xF0FF) === 0xF055) {
+        console.debug(`Executing opcode: FX55`);
+        return new OpCode_FX55();
+    }
+    if ((opcode & 0xF0FF) === 0xF065) {
+        console.debug(`Executing opcode: FX65`);
+        return new OpCode_FX65();
     }
 }
 
