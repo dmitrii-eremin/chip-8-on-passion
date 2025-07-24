@@ -4,3 +4,5 @@ export type ScreenColors = {
     foreground: Color,
     background: Color,
 };
+
+export type OpCode = number;

@@ -6,7 +6,7 @@ import { Size } from "@dmitrii-eremin/passion-engine/engine-build/stdlib/size";
 export class Chip8Screen {
     private pixels: boolean[][] = Array(C8_SCREEN_WIDTH).fill(null).map(() => Array(C8_SCREEN_HEIGHT).fill(null).map(() => Math.random() < 0.5));
     private readonly multiplier = C8_SCREEN_MULTIPLIER;
-    private readonly borderWidth = 4;
+    private readonly borderWidth = 2;
 
     constructor(private passion: Passion, private colors: ScreenColors = C8_DEFAULT_COLORS) {
 
@@ -16,12 +16,8 @@ export class Chip8Screen {
         return new Size(C8_SCREEN_WIDTH * this.multiplier, C8_SCREEN_HEIGHT * this.multiplier);
     }
 
-    set(x: number, y: number, value: boolean): void {
-        if (x < 0 || x >= C8_SCREEN_WIDTH || y < 0 || y >= C8_SCREEN_HEIGHT) {
-            return;
-        }
-
-        this.pixels[x][y] = value;
+    flip(pixels: boolean[][]): void {
+        this.pixels = pixels.map(row => [...row]);
     }
 
     draw(ox: number, oy: number): void {
@@ -29,7 +25,7 @@ export class Chip8Screen {
             ox - this.borderWidth, oy - this.borderWidth,
             C8_SCREEN_WIDTH * this.multiplier + 2 * this.borderWidth,
             C8_SCREEN_HEIGHT * this.multiplier + 2 * this.borderWidth,
-            14
+            5
         );
         for (let ix = 0; ix < C8_SCREEN_WIDTH; ix++) {
             for (let iy = 0; iy < C8_SCREEN_HEIGHT; iy++) {

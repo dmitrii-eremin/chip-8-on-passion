@@ -1,0 +1,5 @@
+import { OpCode } from "./types";
+
+export const DEMO_PROGRAM_1: OpCode[] = [
+    0x00E0, 0x1200, 0x3333, 0x4444, 0x00E0, 0x00E0, 0x00E0, 0x00E0
+];
