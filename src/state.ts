@@ -14,7 +14,7 @@ export class Chip8State {
     waitForKey?: number;
 
     constructor() {
-        this.pixels = Array(C8_SCREEN_WIDTH).fill(null).map(() => Array(C8_SCREEN_HEIGHT).fill(null).map(() => Math.random() < 0.5));
+        this.pixels = Array(C8_SCREEN_WIDTH).fill(null).map(() => Array(C8_SCREEN_HEIGHT).fill(null).map(() => false));
         this.memory = new Array(C8_MEMORY_SIZE).fill(0);
         this.keypad = new Array(C8_KEYPAD_SIZE).fill(false);
         this.stack = [];
