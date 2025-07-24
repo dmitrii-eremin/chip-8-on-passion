@@ -42,36 +42,32 @@ export class Chip8Emu {
             executor.execute(this.state);
             screen.flip(this.state.pixels);
         }
+        else {
+            console.warn(`Unknown opcode at ${this.state.programCounter}, skip`);
+            this.state.programCounter += 2;
+        }
     }
 
     draw(ax: number, ay: number, aw: number, ah: number) {
         const headerOffset = this.drawHeader(ax, ay, aw, this.memoryOffset);
-        this.bytesFit = this.drawByteArray(this.state.memory, ax, headerOffset, aw, ah / 2, this.memoryOffset, [this.state.programCounter, this.state.programCounter + 1]);
+        this.bytesFit = this.drawByteArray(this.state.memory, ax, headerOffset, aw, ah / 2, this.memoryOffset, '00', [this.state.programCounter, this.state.programCounter + 1]);
 
         const memoryBlockBottom = headerOffset + Math.ceil(ah / 2);
         this.updateServiceInfoLayout(ax, memoryBlockBottom, aw);
         const serviceBlockBottom = this.drawServiceInfo(ax, memoryBlockBottom, aw);
-        this.drawByteArray(this.state.stack, ax, serviceBlockBottom, aw, ah / 2, 0);
+        this.drawByteArray(this.state.stack, ax, serviceBlockBottom, aw, ah / 2, 0, '000');
     }
 
     private drawServiceInfo(ax: number, ay: number, aw: number): number {
-        const offset = 4;
-
-        const columns: number[] = [
-            ax + offset,
-            Math.floor(ax + aw / 2 - this.exampleTextSize.width / 2),
-            ax + aw - offset - this.exampleTextSize.width
-        ];
-
         this.drawServiceNumber(0, 0, 'PC', this.state.programCounter);
         this.drawServiceNumber(0, 1, ' I', this.state.indexRegister);
         this.drawServiceNumber(0, 2, 'DT', this.state.delayTimer);
         this.drawServiceNumber(0, 3, 'ST', this.state.soundTimer);
 
         for (let i = 0; i < C8_REGISTER_COUNT / 2; i++) {
-            this.drawServiceNumber(1, i, `V${i}`, this.state.register[i]);
+            this.drawServiceNumber(1, i, `V${i}`, this.state.register[i], 2);
             const j = Math.ceil(i + C8_REGISTER_COUNT / 2);
-            this.drawServiceNumber(2, i, `V${j.toString(16).toUpperCase().padStart(1, '0')}`, this.state.register[j]);
+            this.drawServiceNumber(2, i, `V${j.toString(16).toUpperCase().padStart(1, '0')}`, this.state.register[j], 2);
         }
 
         const bottom = this.getServiceRowY(8);
@@ -106,8 +102,8 @@ export class Chip8Emu {
         return ay + (headerSize?.height ?? 0) + 2 * offset;
     }
 
-    private drawByteArray(data: number[], ax: number, ay: number, aw: number, ah: number, offset: number, highlightIndex: number[] = []): number {
-        const memoryByteSize = this.passion.graphics.textSize('00') ?? new Size(0, 0);
+    private drawByteArray(data: number[], ax: number, ay: number, aw: number, ah: number, offset: number, example: string = '00', highlightIndex: number[] = []): number {
+        const memoryByteSize = this.passion.graphics.textSize(example) ?? new Size(0, 0);
         const memoryByteOffset = new Size(4, 4);
 
         const memoryBytesPerLine = Math.floor((aw - memoryByteOffset.width) / (memoryByteSize.width + memoryByteOffset.width));
