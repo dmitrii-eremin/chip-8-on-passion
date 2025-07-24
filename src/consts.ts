@@ -11,6 +11,7 @@ export const C8_FONT_START_ADDRESS = 0x50;
 export const C8_MEMORY_SIZE = 0x1000;
 export const C8_REGISTER_COUNT = 0x10;
 export const C8_STACK_SIZE = 0x100;
+export const C8_KEYPAD_SIZE = 0xF;
 
 export const C8_DEFAULT_COLORS: ScreenColors = {
     background: '#6b7a8f',

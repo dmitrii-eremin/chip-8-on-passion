@@ -285,12 +285,44 @@ export class OpCode_DXYN implements OpCode {
     }
 }
 
+export class OpCode_EX9E implements OpCode {
+    execute(state: Chip8State): void {
+        const opcode = getCurrentOpCodeValue(state)!;
+        const index = (opcode >> 8) & 0xF;
+        const value = state.register[index];
+        if (state.keypad[value]) {
+            state.programCounter += 2;
+        }
+        state.programCounter += 2;
+    }
+}
+
+export class OpCode_EXA1 implements OpCode {
+    execute(state: Chip8State): void {
+        const opcode = getCurrentOpCodeValue(state)!;
+        const index = (opcode >> 8) & 0xF;
+        const value = state.register[index];
+        if (!state.keypad[value]) {
+            state.programCounter += 2;
+        }
+        state.programCounter += 2;
+    }
+}
+
 export class OpCode_FX07 implements OpCode {
     execute(state: Chip8State): void {
         const opcode = getCurrentOpCodeValue(state)!;
         const index = (opcode >> 8) & 0xF;
         state.register[index] = state.delayTimer & 0xFF;
         state.programCounter += 2;
+    }
+}
+
+export class OpCode_FX0A implements OpCode {
+    execute(state: Chip8State): void {
+        const opcode = getCurrentOpCodeValue(state)!;
+        const index = (opcode >> 8) & 0xF;
+        state.waitForKey = index;
     }
 }
 
@@ -471,9 +503,21 @@ export const createOpCodeFromState = (state: Chip8State, passion: Passion): OpCo
         console.debug(`Executing opcode: DXYN`);
         return new OpCode_DXYN();
     }
+    if ((opcode & 0xF0FF) === 0xE09E) {
+        console.debug(`Executing opcode: EX9E`);
+        return new OpCode_EX9E();
+    }
+    if ((opcode & 0xF0FF) === 0xE0A1) {
+        console.debug(`Executing opcode: EXA1`);
+        return new OpCode_EXA1();
+    }
     if ((opcode & 0xF0FF) === 0xF007) {
         console.debug(`Executing opcode: FX07`);
         return new OpCode_FX07();
+    }
+    if ((opcode & 0xF0FF) === 0xF00A) {
+        console.debug(`Executing opcode: FX0A`);
+        return new OpCode_FX0A();
     }
     if ((opcode & 0xF0FF) === 0xF015) {
         console.debug(`Executing opcode: FX15`);

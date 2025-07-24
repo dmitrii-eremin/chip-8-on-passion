@@ -5,6 +5,7 @@ import { Passion } from "@dmitrii-eremin/passion-engine";
 import { C8_DEFAULT_FONT, C8_FONT_START_ADDRESS, C8_MEMORY_SIZE, C8_PROGRAM_START_ADDRESS, C8_REGISTER_COUNT, C8_STACK_SIZE } from "./consts";
 import { Chip8State } from "./state";
 import { createOpCodeFromState } from "./opcodes";
+import { mapPassionKeyToKeyCode, MAPPED_KEYS } from "./keys";
 
 type ServiceInfoLayout = {
     x: number;
@@ -46,11 +47,16 @@ export class Chip8Emu {
     }
 
     update(dt: number) {
+        this.updatePressedKeys();
     }
 
     executeCurrentCommand(screen: Chip8Screen) {
         this.state.delayTimer = Math.max(0, this.state.delayTimer - 1);
         this.state.soundTimer = Math.max(0, this.state.soundTimer - 1);
+
+        if (this.state.delayTimer > 0) {
+            return;
+        }
 
         const executor = createOpCodeFromState(this.state, this.passion);
         if (executor) {
@@ -179,5 +185,22 @@ export class Chip8Emu {
         const offset = 2;
         const margin = 4;
         return this.serviceInfoLayout.y + (row * (this.exampleTextSize.height + offset)) + margin;
+    }
+
+    private updatePressedKeys() {
+        MAPPED_KEYS.forEach(key => {
+            const keyCode = mapPassionKeyToKeyCode(key);
+            if (keyCode === undefined) {
+                return;
+            }
+            
+            const prevValue = this.state.keypad[keyCode];
+            this.state.keypad[keyCode] = this.passion.input.btn(key);
+            if (!prevValue && this.state.keypad[keyCode] && this.state.waitForKey !== undefined) {
+                this.state.register[this.state.waitForKey] = keyCode;
+                this.state.waitForKey = undefined;
+                this.state.programCounter += 2;
+            } 
+        });
     }
 }

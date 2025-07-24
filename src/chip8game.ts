@@ -8,6 +8,7 @@ import { DEMO_PROGRAM_1, DEMO_PROGRAM_IBM } from "./demo_programs";
 export class Chip8Game {
     private screen: Chip8Screen;
     private emulator: Chip8Emu;
+    private stepByStep = false;
 
     private readonly windowSize = new Size(640, 360);
     private readonly windowOffset = 30;
@@ -25,7 +26,7 @@ export class Chip8Game {
     }
 
     update(dt: number) {
-        if (this.passion.input.btnp('Space')) {
+        if (!this.stepByStep || this.passion.input.btnp('Space')) {
             this.emulator.executeCurrentCommand(this.screen);
         }
         this.emulator.update(dt);
