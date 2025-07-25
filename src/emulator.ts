@@ -5,7 +5,7 @@ import { Passion } from "@dmitrii-eremin/passion-engine";
 import { C8_DEFAULT_FONT, C8_FONT_START_ADDRESS, C8_MEMORY_SIZE, C8_PROGRAM_START_ADDRESS, C8_REGISTER_COUNT, C8_STACK_SIZE } from "./consts";
 import { Chip8State } from "./state";
 import { createOpCodeFromState } from "./opcodes";
-import { mapPassionKeyToKeyCode, MAPPED_KEYS } from "./keys";
+import { KeyCode, mapPassionKeyToKeyCode, MAPPED_KEYS } from "./keys";
 
 type ServiceInfoLayout = {
     x: number;
@@ -193,14 +193,18 @@ export class Chip8Emu {
             if (keyCode === undefined) {
                 return;
             }
-            
-            const prevValue = this.state.keypad[keyCode];
-            this.state.keypad[keyCode] = this.passion.input.btn(key);
-            if (!prevValue && this.state.keypad[keyCode] && this.state.waitForKey !== undefined) {
-                this.state.register[this.state.waitForKey] = keyCode;
-                this.state.waitForKey = undefined;
-                this.state.programCounter += 2;
-            } 
+
+            this.setVirtualKeypad(keyCode, this.passion.input.btn(key));
         });
+    }
+
+    setVirtualKeypad(keyCode: KeyCode, value: boolean) {
+        const prevValue = this.state.keypad[keyCode];
+        this.state.keypad[keyCode] = value;
+        if (!prevValue && this.state.keypad[keyCode] && this.state.waitForKey !== undefined) {
+            this.state.register[this.state.waitForKey] = keyCode;
+            this.state.waitForKey = undefined;
+            this.state.programCounter += 2;
+        } 
     }
 }
